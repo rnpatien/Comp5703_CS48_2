@@ -8,13 +8,15 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "train_gan.py",
-            // "program": "${file}",
+            // "program": "train_gan.py",
+            "program": "${file}",
             "console": "integratedTerminal",
-            "justMyCode": false,
+            "justMyCode": true,
             // "args": ["configs/gan/cifar10/c10_b64.gin", "sndcgan", "--mode=std"]
-            "args": ["configs/gan/GTSRB/gtsrb_b64.gin", "sndcgan", "--mode=std","--no_fid"]
-            // "args": ["configs/gan/cifar10/c10_b512.gin", "sndcgan", "--mode=contrad","--aug=simclr","--use_warmup"]
+            // "args": ["configs/gan/GTSRB/gtsrb_b512.gin", "sndcgan", "--mode=contrad","--aug=simclr","--use_warmup"] //"--no_fid",
+            // "args": ["configs/gan/GTSRB/gtsrb_b64.gin", "sndcgan", "--mode=std","--no_fid"]
+            "args": ["configs/gan/cifar10/c10_b512.gin", "sndcgan", "--mode=contrad","--aug=simclr","--use_warmup"]
+            // "args": [ "/mnt/c/GitHub/Comp5703_CS48_2/ContraDRP/logs/gan/c10_b64/sndcgan/std_none/5553/gen_best.pt",  "sndcgan", "--n_samples=10000"]
         }
     ]
 }

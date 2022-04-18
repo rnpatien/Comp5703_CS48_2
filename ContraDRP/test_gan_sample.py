@@ -62,8 +62,9 @@ def get_options_dict(dataset=gin.REQUIRED,
         "lbd": lbd, "lbd2": lbd2
     }
 
-
+import sys
 if __name__ == '__main__':
+    print ('Argument List:', str(sys.argv))
     P = parse_args()
 
     logdir = Path(P.model_path).parent

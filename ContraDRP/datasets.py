@@ -145,7 +145,8 @@ def get_dataset_ref(dataset):
         reference = data(DATA_PATH, train=False, transform=transforms.ToTensor(), download=True)
     elif dataset == 'GTSRB' :
         data = datasets.GTSRB
-        reference = data(DATA_PATH, split='test', transform=transforms.ToTensor(), download=True)
+        transform=transforms.Resize(size=(32,32))
+        reference = data(DATA_PATH, split='test', transform=transform, download=True)
 
     elif dataset == 'cifar10_hflip' or dataset == 'cifar100_hflip':
         transform = transforms.Compose([

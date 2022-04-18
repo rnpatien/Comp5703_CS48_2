@@ -318,8 +318,9 @@ def worker(gpu, P):
           train_loader=train_loader, logger=logger)
     aa=1
 
-
+import sys
 if __name__ == '__main__':
+    print ('Argument List:', str(sys.argv))
     P = parse_args()
     if P.comment:
         P.comment = '_' + P.comment

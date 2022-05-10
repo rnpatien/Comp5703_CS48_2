@@ -18,6 +18,8 @@ def setup(P):
         filename = f"{P.mode}_{P.aug}_T{P.temp}"
     elif P.mode == 'contrad':
         filename = f"{P.mode}_{P.aug}_L{P.lbd_a}_T{P.temp}"
+    elif P.mode == 'damage':
+        filename = f"{P.mode}_{P.aug}_L{P.lbd_a}_T{P.temp}"
     else:
         raise NotImplementedError()
 

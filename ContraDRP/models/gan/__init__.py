@@ -11,6 +11,12 @@ def get_architecture(architecture, image_size, P=None):
         generator = G_SNDCGAN(image_size=image_size)
         discriminator = D_SNResNet18(mlp_linear=True, d_hidden=1024)
 
+    elif architecture == 'snresPrune':
+        from models.gan.sndcgan import G_SNDCGAN
+        from models.gan.snresnetprune import D_SNResNet18
+        generator = G_SNDCGAN(image_size=image_size)
+        discriminator = D_SNResNet18(mlp_linear=True, d_hidden=1024)
+
     elif architecture == 'stylegan2':
         from models.gan.stylegan2.generator import Generator
         from models.gan.stylegan2.discriminator import ResidualDiscriminatorP

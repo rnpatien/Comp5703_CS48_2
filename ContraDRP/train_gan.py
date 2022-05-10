@@ -31,6 +31,8 @@ from utils import Logger
 from utils import count_parameters
 from utils import set_grad
 
+from mask import Mask
+
 # import for gin binding
 import penalty
 
@@ -136,9 +138,16 @@ def train(P, opt, train_fn, models, optimizers, train_loader, logger):
             metrics['fid_score'] = FIDScore(opt['dataset'], opt['fid_size'], P.n_eval_avg)
 
     logger.log_dirname("Steps {}".format(P.starting_step))
+    no_steps_in_epoch=int (50000/opt['batch_size'])
     dist.barrier()
 
     for step in range(P.starting_step, opt['max_steps']+1):
+        if P.architecture == "snresPrune" and step % no_steps_in_epoch== 1  :
+            print('update prunte mask')
+            pruneMask = Mask(discriminator)
+            magnitudePrunePercent = 0.9
+            pruneMask.magnitudePruning(magnitudePrunePercent, 0)
+
         generator.train()
         discriminator.train()
         if P.use_warmup:
@@ -154,13 +163,15 @@ def train(P, opt, train_fn, models, optimizers, train_loader, logger):
             images = images.cuda()
             gen_images = _sample_generator(generator, images.size(0),
                                            enable_grad=False)
-
-            d_loss, aux = train_fn["D"](P, discriminator, opt, images, gen_images)
-            loss = d_loss + aux['penalty']
-
-            opt_D.zero_grad()
-            loss.backward()
-            opt_D.step()
+            if P.architecture == "snresPrune":
+                d_loss, aux = train_fn["D"](P, discriminator, opt, images, gen_images,opt_D=opt_D)
+                loss = d_loss
+            else:
+                d_loss, aux = train_fn["D"](P, discriminator, opt, images, gen_images)
+                loss = d_loss  + aux['penalty']
+                opt_D.zero_grad()
+                loss.backward()
+                opt_D.step()
             losses['D_loss'].append(d_loss.item())
             losses['D_penalty'].append(aux['penalty'].item())
             losses['D_real'].append(aux['d_real'].item())
@@ -237,7 +248,8 @@ def worker(gpu, P):
 
     P.rank = P.rank * P.n_gpus_per_node + gpu
     dist.init_process_group(backend='nccl',
-                            init_method=f'tcp://127.0.0.1:{P.port}',
+                            # init_method=f'tcp://127.0.0.1:{P.port}',
+                            init_method='tcp://127.0.0.1:40404',
                             world_size=P.world_size,
                             rank=P.rank)
 
@@ -310,7 +322,8 @@ def worker(gpu, P):
     P.augment_fn = get_augment(mode=P.aug).cuda()
     generator = DistributedDataParallel(generator, device_ids=[gpu], broadcast_buffers=False)
     generator.sample_latent = generator.module.sample_latent
-    discriminator = DistributedDataParallel(discriminator, device_ids=[gpu], broadcast_buffers=False)
+    discriminator = discriminator.cuda()
+    discriminator = DistributedDataParallel(discriminator, device_ids=[gpu], broadcast_buffers=False,find_unused_parameters=True)  #,find_unused_parameters=True
 
     train(P, options, P.train_fn,
           models=(generator, discriminator),

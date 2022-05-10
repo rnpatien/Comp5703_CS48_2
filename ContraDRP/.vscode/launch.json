@@ -8,15 +8,24 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            // "program": "train_gan.py",
-            "program": "${file}",
+            "program": "train_gan.py",
+            // "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            // "args": ["configs/gan/cifar10/c10_b64.gin", "sndcgan", "--mode=std"]
-            // "args": ["configs/gan/GTSRB/gtsrb_b512.gin", "sndcgan", "--mode=contrad","--aug=simclr","--use_warmup"] //"--no_fid",
-            // "args": ["configs/gan/GTSRB/gtsrb_b64.gin", "sndcgan", "--mode=std","--no_fid"]
-            "args": ["configs/gan/cifar10/c10_b512.gin", "sndcgan", "--mode=contrad","--aug=simclr","--use_warmup"]
-            // "args": [ "/mnt/c/GitHub/Comp5703_CS48_2/ContraDRP/logs/gan/c10_b64/sndcgan/std_none/5553/gen_best.pt",  "sndcgan", "--n_samples=10000"]
+            // "args": ["configs/gan/cifar10/c10_b512.gin", "snresnet18", "--mode=damage","--aug=simclr","--use_warmup"] // standard 
+            "args": ["configs/gan/cifar10/c10_b512.gin", "snresPrune", "--mode=damage","--aug=simclr","--use_warmup"] // standard 
+
+            // "args": ["configs/gan/cifar10/c10_b64.gin", "sndcgan", "--mode=std"] // standard 
+            // "args": ["configs/gan/cifar10/c10_b512.gin", "sndcgan", "--mode=contrad","--aug=simclr","--use_warmup"]
+            // "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/3383/gen_best.pt",  "sndcgan", "--n_samples=200"]  // just generates samples from pretrained
+            // "args": [ "logs/gan/c10_b64X/sndcgan/std_none/5553/gen_best.pt",  "sndcgan"] //for lineval
+            //"args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/3383/samples_174_n10000","third_party/fid/cifar10_stats.npz",   "--n_imgs=10000", "--gpu=0", "--verbose"] //not tested
+
+            //  "args": ["configs/gan/cifar10/c10_b64.gin", "snresnet18 ", "--mode=std"] // standard 
+            //  "args": ["configs/gan/cifar10/c10_b512.gin", "snresnet18 ", "--mode=contrad","--aug=simclr","--use_warmup"]           
+
+            // "args": ["configs/gan/GTSRB/gtsrb_b64.gin", "sndcgan", "--mode=std"]  //german road signs
+            // "args": ["configs/gan/GTSRB/gtsrb_b512.gin", "sndcgan", "--mode=contrad","--aug=simclr","--use_warmup"] 
         }
     ]
 }

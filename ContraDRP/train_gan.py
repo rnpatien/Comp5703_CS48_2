@@ -63,8 +63,8 @@ def parse_args():
                         help='Do not save GIF of sample generations from a fixed latent periodically during training')
     parser.add_argument('--n_eval_avg', default=3, type=int,
                         help='How many times to average FID and IS')
-    parser.add_argument('--print_every', help='', default=50, type=int)
-    parser.add_argument('--evaluate_every', help='', default=2000, type=int)
+    parser.add_argument('--print_every', help='', default=96, type=int)
+    parser.add_argument('--evaluate_every', help='', default=1000, type=int) #rp??
     parser.add_argument('--save_every', help='', default=100000, type=int)
     parser.add_argument('--comment', help='Comment', default='', type=str)
 
@@ -142,8 +142,8 @@ def train(P, opt, train_fn, models, optimizers, train_loader, logger):
     dist.barrier()
 
     for step in range(P.starting_step, opt['max_steps']+1):
-        if P.architecture == "snresPrune" and step % no_steps_in_epoch== 1  :
-            print('update prunte mask')
+        if P.mode == "damage" and step % no_steps_in_epoch== 1  :
+            # print('update prune mask')
             pruneMask = Mask(discriminator)
             magnitudePrunePercent = 0.9
             pruneMask.magnitudePruning(magnitudePrunePercent, 0)
@@ -163,7 +163,7 @@ def train(P, opt, train_fn, models, optimizers, train_loader, logger):
             images = images.cuda()
             gen_images = _sample_generator(generator, images.size(0),
                                            enable_grad=False)
-            if P.architecture == "snresPrune":
+            if P.mode == "damage":
                 d_loss, aux = train_fn["D"](P, discriminator, opt, images, gen_images,opt_D=opt_D)
                 loss = d_loss
             else:
@@ -206,7 +206,7 @@ def train(P, opt, train_fn, models, optimizers, train_loader, logger):
             fixed_gen = metrics.get('fixed_gen')
             image_grid = metrics.get('image_grid')
 
-            if fid_score:
+            if False: #fid_score:
                 fid_avg = fid_score.update(step, generator.module)
                 fid_score.save(logger.logdir + f'/results_fid_{P.eval_seed}.csv')
                 logger.scalar_summary('gan/test/fid', fid_avg, step)
@@ -323,7 +323,7 @@ def worker(gpu, P):
     generator = DistributedDataParallel(generator, device_ids=[gpu], broadcast_buffers=False)
     generator.sample_latent = generator.module.sample_latent
     discriminator = discriminator.cuda()
-    discriminator = DistributedDataParallel(discriminator, device_ids=[gpu], broadcast_buffers=False,find_unused_parameters=True)  #,find_unused_parameters=True
+    discriminator = DistributedDataParallel(discriminator, device_ids=[gpu], broadcast_buffers=False,find_unused_parameters=True)  #
 
     train(P, options, P.train_fn,
           models=(generator, discriminator),

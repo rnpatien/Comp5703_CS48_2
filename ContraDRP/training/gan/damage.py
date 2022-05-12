@@ -44,47 +44,46 @@ def loss_D_fn(P, D, options, images, gen_images, opt_D=None):
     gen_images = gen_images.detach()
     N = images.size(0)
 
-    #cat_images = torch.cat([images, images, gen_images], dim=0)
     inputs_1 = P.augment_fn(images)
     inputs_2 = P.augment_fn(images)
     inputs_g= P.augment_fn(gen_images)
+    opt_D.zero_grad() 
 
-    opt_D.zero_grad()
-    # calculate the grad for non-pruned network
-    with torch.no_grad():
-        # branch with pruned network
-        D.module.set_prune_flag(True)
-        features_2 = D(inputs_2)
-        features_2_noGrad = features_2.detach()
-    D.module.set_prune_flag(False)
-    features_1 = D(inputs_1) 
-    simclr_loss1 = nt_xent(features_1, features_2_noGrad, temperature=P.temp)
-    simclr_loss1.backward()
-    # calculate the grad for pruned network
-    features_1_no_grad = features_1.detach()
+    #do dammage logic
     D.module.set_prune_flag(True)
-    features_2= D(inputs_2)
-    simclr_loss2 = nt_xent(features_1_no_grad, features_2,  temperature=P.temp)
-    simclr_loss2.backward()
-    # opt_D.step()    
-    # opt_D.zero_grad()
+    aux = D(inputs_1, sg_linear=True, projection=True, projection2=False,clrOnly= True)
+    view1_det = F.normalize(aux['projection']).detach()
+    D.module.set_prune_flag(False)
+    aux = D(inputs_2, sg_linear=True, projection=True, projection2=False,clrOnly= True)
+    view2 = F.normalize(aux['projection'])
+    simclr_loss = nt_xent(view1_det, view2 , temperature=P.temp)       
+    simclr_loss.backward()
+    D.module.set_prune_flag(True)
+    aux = D(inputs_1, sg_linear=True, projection=True, projection2=False,clrOnly= True)
+    view1 = F.normalize(aux['projection'])
+    view2_det=view2.detach()
+    simclr_loss = nt_xent(view1, view2_det , temperature=P.temp)       
+    simclr_loss.backward()
+    D.module.set_prune_flag(False)
 
-    #now contract the fakes
+
+    #now contraD contrast
     cat_images = torch.cat([inputs_1, inputs_2, inputs_g], dim=0)
-    features_g,auxg = D(cat_images,projection2=True)
+    d_all,auxg = D(cat_images, sg_linear=True, projection=False, projection2=True)
     reals = auxg['projection2']
     reals = F.normalize(reals)
     real1, real2, fakes = reals[:N], reals[N:2*N], reals[2*N:]
     sup_loss = supcon_fake(real1, real2, fakes, temperature=P.temp, distributed=P.distributed)
-    loss=sup_loss  #+simclr_loss1+simclr_loss2
-    loss.backward()
-    opt_D.step()     
-    opt_D.zero_grad()
 
-    d_real = features_g #features_1 ##rp concat here
-    d_gen = features_1
+    d_real, d_gen = d_all[:N], d_all[2*N:3*N]
+    #finally calc the discriminator
     if options['loss'] == 'nonsat':
         d_loss = F.softplus(d_gen).mean() + F.softplus(-d_real).mean()
+
+    #update everything
+    loss=sup_loss + d_loss # +  simclr_loss  #+simclr_loss1+simclr_loss2
+    loss.backward()
+    opt_D.step()
 
     return  sup_loss, {
         "penalty": d_loss,

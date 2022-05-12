@@ -106,9 +106,10 @@ class BaseDiscriminator(nn.Module, metaclass=ABCMeta):
 
     def forward(self, inputs, y=None,
                 penultimate=False, projection=False, projection2=False,
-                finetuning=False, sg_linear=False):
+                finetuning=False, sg_linear=False, clrOnly= False):
         _aux = {}
         _return_aux = False
+        _return_output =True
 
         if finetuning:
             is_train = self.training
@@ -120,17 +121,20 @@ class BaseDiscriminator(nn.Module, metaclass=ABCMeta):
         else:
             features = self.penultimate(inputs)
 
-        if sg_linear:
-            features_d = features.detach()
+        if clrOnly:
+            _return_output=False
         else:
-            features_d = features
+            if sg_linear:
+                features_d = features.detach()
+            else:
+                features_d = features
+            output = self.linear(features_d, y)
 
-        output = self.linear(features_d, y)
         project = self.projection(features)
         project2 = self.projection2(features)
 
-        _nuisance = (project.mean() + project2.mean()) * 0.
-        output = output + _nuisance
+        # _nuisance = (project.mean() + project2.mean()) * 0. rp??
+        #output = output + _nuisance
 
         if penultimate:
             _return_aux = True
@@ -145,7 +149,10 @@ class BaseDiscriminator(nn.Module, metaclass=ABCMeta):
             _aux['projection2'] = project2
 
         if _return_aux:
-            return output, _aux
+            if _return_output:
+                return output, _aux
+            else:
+                return _aux
 
         return output
 

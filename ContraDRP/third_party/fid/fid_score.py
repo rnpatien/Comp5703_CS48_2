@@ -157,6 +157,19 @@ def compute_stats_from_G(G, model, size, batch_size):
 
     return mu, sigma
 
+def compute_stats_from_Images(imgs, model):
+    model.eval()
+    batch_size=imgs.shape[0]
+    imgsTens=torch.tensor(imgs,device=device)
+    predictions = []
+    pred = model(imgsTens)[0]
+    predictions.append(pred.view(imgsTens.size(0), -1).cpu())
+    predictions = torch.cat(predictions, dim=0)
+    predictions = predictions.cpu().data.numpy()
+    mu = np.mean(predictions, axis=0)
+    sigma = np.cov(predictions, rowvar=False)
+    return mu, sigma
+
 
 def compute_stats_from_dataloader(dataloader, model):
     """Calculates the FID of two paths"""
@@ -203,6 +216,22 @@ def fid_score(path_base, G, size=10000, batch_size=50, model=None, dims=2048):
 
     return fid_value
 
+def fid_score_img(path_base,imgs,model, dims=2048):
+    if not os.path.exists(path_base):
+        raise RuntimeError('Invalid path: %s' % path_base)
+
+    computed_stats_base = np.load(path_base)
+    m1, s1 = computed_stats_base['mu'][:], computed_stats_base['sigma'][:]
+
+    if model is None:
+        block_idx = InceptionV3.BLOCK_INDEX_BY_DIM[dims]
+        model = InceptionV3([block_idx]).to(device)
+
+    m2, s2 = compute_stats_from_Images(imgs, model)
+
+    fid_value = calculate_frechet_distance(m1, s1, m2, s2)
+
+    return fid_value, m1, s1, m2, s2  
 
 def precompute_stats(dataset, save_path, model=None, dims=2048):
     from datasets import get_dataset_ref

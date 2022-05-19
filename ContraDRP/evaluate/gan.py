@@ -6,7 +6,7 @@ from torchvision.utils import make_grid
 
 from evaluate import BaseEvaluator
 from third_party.fid.inception import InceptionV3
-from third_party.fid.fid_score import fid_score
+from third_party.fid.fid_score import fid_score,fid_score_img
 from third_party.fid.fid_score import precompute_stats
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -121,6 +121,12 @@ class FIDScore(BaseEvaluator):
         self._steps.append(step)
         self._best.append(score_best)
         return score_avg
+
+    def FIDforImgs(self,imgs):
+        scores = []
+        score,m1, s1, m2, s2  = fid_score_img(self._precomputed_path, imgs, model=self._fid_model)
+        m2 = np.mean(m2)
+        return score,m2
 
     @property
     def value(self):

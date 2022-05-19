@@ -64,7 +64,7 @@ def parse_args():
     parser.add_argument('--n_eval_avg', default=3, type=int,
                         help='How many times to average FID and IS')
     parser.add_argument('--print_every', help='', default=96, type=int)
-    parser.add_argument('--evaluate_every', help='', default=1000, type=int) #rp??
+    parser.add_argument('--evaluate_every', help='', default=2000, type=int) #rp??
     parser.add_argument('--save_every', help='', default=100000, type=int)
     parser.add_argument('--comment', help='Comment', default='', type=str)
 
@@ -206,7 +206,7 @@ def train(P, opt, train_fn, models, optimizers, train_loader, logger):
             fixed_gen = metrics.get('fixed_gen')
             image_grid = metrics.get('image_grid')
 
-            if False: #fid_score:
+            if fid_score:
                 fid_avg = fid_score.update(step, generator.module)
                 fid_score.save(logger.logdir + f'/results_fid_{P.eval_seed}.csv')
                 logger.scalar_summary('gan/test/fid', fid_avg, step)

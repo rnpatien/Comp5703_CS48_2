@@ -8,8 +8,9 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
+            "program": "test_inception.py",
             // "program": "train_gan.py",
-            "program": "${file}",
+            // "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
             // "args": ["configs/gan/cifar10/c10_b512.gin", "snresPrune", "--mode=damage","--aug=simclr","--use_warmup"] // standard 
@@ -27,9 +28,9 @@
             // "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/3383/gen_best.pt",  "sndcgan", "--n_samples=200"]  // just generates samples from pretrained
 
             // "args": [ "logs/gan/c10_b512/snresnet18/contrad_simclr_L1.0_T0.1/9950/dis.pt",  "snresnet18"] //for lineval
-            "args": [ "logs/gan/c10_b512/snresnet18/contrad_simclr_L1.0_T0.1/9950", "logs/gan/c10_b512/snresnet18/contrad_simclr_L1.0_T0.1/9950/lin_eval_7859.pth.tar",  "snresnet18"] //for test_gan_sample_cddls.py
+            // "args": [ "logs/gan/c10_b512/snresnet18/contrad_simclr_L1.0_T0.1/9950", "logs/gan/c10_b512/snresnet18/contrad_simclr_L1.0_T0.1/9950/lin_eval_7859.pth.tar",  "snresnet18"] //for test_gan_sample_cddls.py
 
-            //"args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/3383/samples_174_n10000","third_party/fid/cifar10_stats.npz",   "--n_imgs=10000", "--gpu=0", "--verbose"] //not tested
+            "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/3383/samples_5576_n200","third_party/fid/cifar10_stats.npz", "--dataset=cifar10" , "--n_imgs=200", "--gpu=0", "--verbose"] //not tested
         }
     ]
 }

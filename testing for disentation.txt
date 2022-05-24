@@ -1,0 +1,19 @@
+
+Testing contraD v's Damage
+
+To start RP to do this today
+	Add small program to dump cifar10 into class directory containing images--cifar-10-imbalance
+	Add data set loader to load this.
+
+Test 1 team to do this
+	do 2 (contraD, dammage) training runs on cifar-10 resnet 200K steps
+				capture FID, images
+		run test_lineval.py and capture the accuracy
+		run test_gan_sample_cddls.py generates sample by class
+		run test_inception.py on each class for FID
+		
+Test 2
+	create imbalance dataset (deleting members of a given class)
+		Us rp program and new cifar imbalance load 
+		
+	Re do as done for balanced dataset 

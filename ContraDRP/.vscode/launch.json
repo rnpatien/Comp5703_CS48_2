@@ -12,9 +12,11 @@
             // "program": "train_gan.py",
             "program": "${file}",
             "console": "integratedTerminal",
-            "justMyCode": true,
-            // "args": ["configs/gan/cifar10/c10_b512.gin", "snresPrune", "--mode=damage","--aug=simclr","--use_warmup"] // damage resnet
-            // "args": ["configs/gan/cifar10/c10_b512.gin", "snresPrune", "--mode=damage","--aug=simclr","--use_warmup","--resume=logs/gan/c10_b512/snresPrune/damage_simclr_L1.0_T0.1/3638"]  
+            "justMyCode": false,
+
+            // tests for paper
+            //  "args": ["configs/gan/cifar10/c10_b512.gin", "snresPrune", "--mode=damage","--aug=simclr","--use_warmup"] // damage resnet
+            //  "args": ["configs/gan/cifar10/c10_b512.gin", "snresnet18", "--mode=contrad","--aug=simclr","--use_warmup"] // contraD resnet  
 
             // "args": ["configs/gan/cifar10/c10_b64.gin", "sndcgan", "--mode=std"] // standard dcgan 
             // "args": ["configs/gan/cifar10/c10_b512.gin", "sndcgan", "--mode=contrad","--aug=simclr","--use_warmup"] // standard contraD
@@ -29,7 +31,10 @@
             // "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/3383/gen_best.pt",  "sndcgan", "--n_samples=200"]  // for test_gan_sample.py generates samples from pretrained gan
             // "args": [ "logs/gan/c10_b512/snresnet18/contrad_simclr_L1.0_T0.1/9950/dis.pt",  "snresnet18"] //for test_lineval.py trains classification from pretained gan
             // "args": [ "logs/gan/c10_b512/snresnet18/contrad_simclr_L1.0_T0.1/9950", "logs/gan/c10_b512/snresnet18/contrad_simclr_L1.0_T0.1/9950/lin_eval_7859.pth.tar",  "snresnet18"] //for test_gan_sample_cddls.py once classification is done
-            "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/3383/samples_5576_n200","third_party/fid/cifar10_stats.npz", "--dataset=cifar10" , "--n_imgs=200", "--gpu=0", "--verbose"] // test_inception.py
+            // "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/3383/samples_5576_n200","third_party/fid/cifar10_stats.npz", "--dataset=cifar10" , "--n_imgs=200", "--gpu=0", "--verbose"] // test_inception.py
+            // helpful parameters
+            // "args": ["configs/gan/cifar10/c10_b512.gin", "snresPrune", "--mode=damage","--aug=simclr","--use_warmup","--resume=logs/gan/c10_b512/snresPrune/damage_simclr_L1.0_T0.1/3638"] 
+
         }
     ]
 }

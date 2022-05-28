@@ -52,7 +52,8 @@ class cifarImbalanceataset(Dataset):
             for root, _, fnames in sorted(os.walk(target_dir, followlinks=True)):
                 for fname in sorted(fnames):
                     path = os.path.join(root, fname)
-                    item = path, class_index
+                    samplenp = np.load(path)
+                    item = samplenp, class_index
                     instances.append(item)
 
                     if target_class not in available_classes:
@@ -66,8 +67,8 @@ class cifarImbalanceataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        path, target = self._samples[idx]
-        samplenp = np.load(path)
+        samplenp, target = self._samples[idx]
+        # samplenp = np.load(path)
         # sample= np.resize(sample,(3,32,32))
         samplenp=np.transpose(np.reshape(samplenp,(3, 32,32)), (1,2,0))
         sample = self.transform(samplenp)

@@ -9,16 +9,16 @@
             "type": "python",
             "request": "launch",
             // "program": "test_inception.py",
-            // "program": "train_gan.py",
-            "program": "${file}",
+            "program": "train_gan.py",
+            // "program": "${file}",
             "console": "integratedTerminal",
-            "justMyCode": false,
+            "justMyCode": true,
 
             // tests for paper
             //  "args": ["configs/gan/cifar10/c10_b512.gin", "snresPrune", "--mode=damage","--aug=simclr","--use_warmup"] // damage resnet
             //  "args": ["configs/gan/cifar10/c10_b512.gin", "snresnet18", "--mode=contrad","--aug=simclr","--use_warmup"] // contraD resnet  
 
-            // "args": ["configs/gan/cifar10/c10_b64.gin", "sndcgan", "--mode=std"] // standard dcgan 
+            "args": ["configs/gan/cifar10/c10_b64.gin", "sndcgan", "--mode=std","--no_fid"] // standard dcgan 
             // "args": ["configs/gan/cifar10/c10_b512.gin", "sndcgan", "--mode=contrad","--aug=simclr","--use_warmup"] // standard contraD
 
             //  "args": ["configs/gan/cifar10/c10_b64.gin", "snresnet18", "--mode=std"] // standard resnet 

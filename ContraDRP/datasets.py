@@ -1,6 +1,7 @@
 import os
 
 from torchvision import datasets, transforms
+from cifar_imbalance import cifarImbalanceataset
 
 DATA_PATH = os.environ.get('DATA_DIR', 'data/')
 
@@ -19,7 +20,14 @@ def get_dataset(dataset):
         test_set = data(DATA_PATH, train=False, transform=transform, download=True)
 
         return train_set, test_set, image_size
+    elif dataset == 'cifar10Imb' :  #'cifar10Imb' 
+        image_size = (32,32, 3)
+        transform = transforms.ToTensor()
 
+        train_set = cifarImbalanceataset(DATA_PATH + '/cifar-10-imbalance/train',  transform=transform)  #+'
+        test_set = cifarImbalanceataset(DATA_PATH + '/cifar-10-imbalance/test',  transform=transform)
+
+        return train_set, test_set, image_size
     elif dataset == 'GTSRB' :
         image_size = (32,32, 3)
         #transform = transforms.ToTensor()

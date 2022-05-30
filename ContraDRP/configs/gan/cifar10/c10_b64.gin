@@ -1,4 +1,4 @@
-options.dataset = "cifar10Imb"
+options.dataset = "cifar10"
 options.batch_size = 64
 options.loss = "nonsat"
 options.max_steps = 200000

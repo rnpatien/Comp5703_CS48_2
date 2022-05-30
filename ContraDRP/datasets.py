@@ -1,33 +1,38 @@
 import os
 
 from torchvision import datasets, transforms
-from cifar_imbalance import cifarImbalanceataset
+from cifar_imbalance import CustomCIFAR10
+import numpy as np
+
 
 DATA_PATH = os.environ.get('DATA_DIR', 'data/')
 
 
-def get_dataset(dataset):
+def get_dataset(dataset, splitFname=None):
     if dataset == 'cifar10' or dataset == 'cifar100':
-        image_size = (32, 32, 3)
-        transform = transforms.ToTensor()
+        if splitFname is None:
+            image_size = (32, 32, 3)
+            transform = transforms.ToTensor()
 
-        if dataset == 'cifar10':
-            data = datasets.CIFAR10
-        else:
-            data = datasets.CIFAR100
+            if dataset == 'cifar10':
+                data = datasets.CIFAR10
+            else:
+                data = datasets.CIFAR100
 
-        train_set = data(DATA_PATH, train=True, transform=transform, download=True)
-        test_set = data(DATA_PATH, train=False, transform=transform, download=True)
+            train_set = data(DATA_PATH, train=True, transform=transform, download=True)
+            test_set = data(DATA_PATH, train=False, transform=transform, download=True)
 
-        return train_set, test_set, image_size
-    elif dataset == 'cifar10Imb' :  #'cifar10Imb' 
-        image_size = (32,32, 3)
-        transform = transforms.ToTensor()
+            return train_set, test_set, image_size
+        else: 
+            image_size = (32,32, 3)
+            transform = transforms.ToTensor()
 
-        train_set = cifarImbalanceataset(DATA_PATH + '/cifar-10-imbalance/train',  transform=transform)  #+'
-        test_set = cifarImbalanceataset(DATA_PATH + '/cifar-10-imbalance/test',  transform=transform)
+            train_idx = list(np.load('split/cifar10_imbSub_with_subsets/{}'.format(splitFname)))
+            train_set = CustomCIFAR10(train_idx,root=DATA_PATH,  transform=transform)  #+'
+            test_set = datasets.CIFAR10(DATA_PATH, train=False, transform=transform)
+            print('imbalance class numbers',train_set.idxsNumPerClass)
 
-        return train_set, test_set, image_size
+            return train_set, test_set, image_size
     elif dataset == 'GTSRB' :
         image_size = (32,32, 3)
         #transform = transforms.ToTensor()

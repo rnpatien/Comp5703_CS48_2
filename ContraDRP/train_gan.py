@@ -84,6 +84,10 @@ def parse_args():
     parser.add_argument('--port', default=40404, type=int,
                         help='Port number to be allocated for distributed training')
 
+    # rp additions 
+    parser.add_argument('--imbalanceDS', action='store_true', help='load index to imbalanceDS for cifar10')
+    parser.add_argument('--trainSplit', default='split1_D_b.npy', type=str, help='Split list') #cifar10_imbSub_with_subsets/
+
     return parser.parse_args()
 
 
@@ -253,7 +257,10 @@ def worker(gpu, P):
                             world_size=P.world_size,
                             rank=P.rank)
 
-    train_set, _, image_size = get_dataset(dataset=options['dataset'])
+    if P.imbalanceDS:
+        train_set, _, image_size = get_dataset(dataset=options['dataset'],splitFname=P.trainSplit)
+    else:
+        train_set, _, image_size = get_dataset(dataset=options['dataset'])
     train_sampler = DistributedSampler(train_set)
 
     options['batch_size'] = options['batch_size'] // P.n_gpus_per_node

@@ -9,16 +9,34 @@
             "type": "python",
             "request": "launch",
             // "program": "test_inception.py",
-            "program": "train_gan.py",
-            // "program": "${file}",
+            // "program": "train_gan.py",
+            // "program": "test_gan_sample.py",
+            // "program": "test_gan_sample_RP.py",
+            "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": false,
 
+            // analse images
+            "args": [ "/mnt/e/5704_testcase","third_party/fid/cifar10_stats.npz", "--n_imgs=1000", "--verbose"]  //generate fid for image set
+            // "args": [ "/mnt/e/5704_testcase", "logs/gan/c10_b512X/sndcgan/contrad_simclr/DC_CD_FL",
+            //      "logs/gan/c10_b512X/sndcgan/contrad_simclr/DC_CD_FL/lin_eval_3169.pth.tar",  "sndcgan"]  //use linear classifier on images 
+
+
+                        // the test set
+            // "args": [ "logs/gan/c10_b64/sndcgan/std_none/split1_D_i/gen_best.pt",  "sndcgan", "--n_samples=2000"]
+            // "args": [ "logs/gan/c10_b64X/sndcgan/std_none/DC_NA_FL/gen_best.pt",  "sndcgan", "--n_samples=2000"]
+            // "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr_L1.0_T0.1/DC_CD_FL/gen_best.pt",  "sndcgan", "--n_samples=2000"] 
+            // "args": [ "logs/gan/c10_b512/snresPrune/damage_simclr_L1.0_T0.1/RS_DM_FL/gen_best.pt",  "sndcgan", "--n_samples=2000"] 
+
             // tests for paper
-            //  "args": ["configs/gan/cifar10/c10_b512.gin", "snresPrune", "--mode=damage","--aug=simclr","--use_warmup"] // damage resnet
+            // "args": ["configs/gan/cifar10/c10_b64.gin", "sndcgan", "--mode=std","--imbalance","--trainSplit=split1_D_i.npy"]  
+            // "args": ["configs/gan/cifar10/c10_b512.gin", "snresnet18", "--mode=contrad","--aug=simclr","--use_warmup","--imbalance","--trainSplit=split1_D_b.npy"
+            // "args": ["configs/gan/cifar10/c10_b512.gin", "snresPrune", "--mode=damage","--aug=simclr","--use_warmup","--imbalance","--trainSplit=split1_D_b.npy",
+            //     "--resume=logs/gan/c10_b512/snresPrune/damage_simclr_L1.0_T0.1/8023"] // damage resnet
+            //  "args": ["configs/gan/cifar10/c10_b512.gin", "snresPrune", "--mode=damage","--aug=simclr","--use_warmup","--resume=logs/gan/c10_b512/snresPrune/damage_simclr_L1.0_T0.1/3917"] // damage resnet
             //  "args": ["configs/gan/cifar10/c10_b512.gin", "snresnet18", "--mode=contrad","--aug=simclr","--use_warmup"] // contraD resnet  
 
-            "args": ["configs/gan/cifar10/c10_b64.gin", "sndcgan", "--mode=std","--imbalance","--trainSplit=split1_D_b.npy"] // std gan with imbalance index
+            // "args": ["configs/gan/cifar10/c10_b64.gin", "sndcgan", "--mode=std","--imbalance","--trainSplit=split1_D_b.npy"] // std gan with imbalance index
             // "args": ["configs/gan/cifar10/c10_b64.gin", "sndcgan", "--mode=std"] // standard dcgan 
             // "args": ["configs/gan/cifar10/c10_b512.gin", "sndcgan", "--mode=contrad","--aug=simclr","--use_warmup"] // standard contraD
 
@@ -35,7 +53,13 @@
             // "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/3383/samples_5576_n200","third_party/fid/cifar10_stats.npz", "--dataset=cifar10" , "--n_imgs=200", "--gpu=0", "--verbose"] // test_inception.py
             // helpful parameters
             // "args": ["configs/gan/cifar10/c10_b512.gin", "snresPrune", "--mode=damage","--aug=simclr","--use_warmup","--resume=logs/gan/c10_b512/snresPrune/damage_simclr_L1.0_T0.1/3638"] 
-
+                
+            // testing after training 3090 test area
+            // test_gan_sampleRP
+            // "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/3383","logs/gan/c10_b512X/sndcgan/contrad_simclr/3383/lin_eval_3169.pth.tar",  "sndcgan", "--n_samples=1000"]  // for test_gan_sample.py generates samples from pretrained gan
+            // "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr_L1.0_T0.1/3383/dis.pt",  "sndcgan"] //for test_lineval.py trains classification from pretained gan
+            // "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/DC_CD_FL", "logs/gan/c10_b512X/sndcgan/contrad_simclr/DC_CD_FL/lin_eval_3169.pth.tar",  "sndcgan"] //for test_gan_sample_cddls.py once classification is done
+            // "args": [ "logs/gan/c10_b512X/sndcgan/contrad_simclr/3383/samples_5576_n200","third_party/fid/cifar10_stats.npz", "--dataset=cifar10" , "--n_imgs=200", "--gpu=0", "--verbose"] // test_inception.py
         }
     ]
 }

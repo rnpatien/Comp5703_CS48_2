@@ -47,69 +47,78 @@ if args.inception_dir is None:
     args.inception_dir = 'third_party/tf/resources'
 PATH_INC = fid.check_or_download_inception(args.inception_dir)
 
-PATH_DATA = args.images
-if not os.path.exists(PATH_DATA):
-    raise RuntimeError("Invalid path: %s" % PATH_DATA)
-PATH_DATA = pathlib.Path(PATH_DATA)
-data = list(PATH_DATA.glob('*.jpg')) + list(PATH_DATA.glob('*.png'))
+orgPath = args.images    
+GBL_FN = str(orgPath +'/'+ f'test_inceptionMax1.csv') # max min
+init_logfile(GBL_FN, "FID,IS_MEAN,IS_STD,TEST")
 
-if args.verbose:
-    print("# DEBUG:::PATH_INC = " + str(PATH_INC))
-    print("# DEBUG:::PATH_DATA = " + str(PATH_DATA))
+# theList=["DC_CD_FL","DC_NA_FL","DC_NA_IM","DC_NA_PR","RS_CD_IM","RS_CD_PR","RS_DM_FL","RS_DM_IM","RS_DM_PR"]
+theList=["RS_CD_IM","RS_DM_IM"] #max min option
 
-if args.verbose and args.gpu != "":
-    print("# Setting CUDA_VISIBLE_DEVICES to: " + str(args.gpu))
-os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+for partPath in theList:
+    PATH_DATA="/mnt/e/5704_testcase/"+partPath + "/max/"
+    if not os.path.exists(PATH_DATA):
+        raise RuntimeError("Invalid path: %s" % PATH_DATA)
+    PATH_DATA = pathlib.Path(PATH_DATA)
+    data = list(PATH_DATA.glob('*.jpg')) + list(PATH_DATA.glob('*.png'))
 
-OUT_FN = str(PATH_DATA / f'test_inception_{str(np.random.randint(10000))}.csv')
-init_logfile(OUT_FN, "FID,IS_MEAN,IS_STD")
-
-#-------------------------------------------------------------------------------
-if args.verbose:
-    print("# Reading %d images..." % args.n_imgs, end="", flush=True)
-
-# Read stats
-f = np.load(args.stats)
-mu_real, sigma_real = f['mu'][:], f['sigma'][:]
-f.close()
-
-X = np.array([imread(str(data[i])).astype(np.float32) for i in range(args.n_imgs)])
-
-if args.verbose:
-    print("done")
-    print("# image values in range [%.2f, %.2f]" % (X.min(), X.max()))
-
-#-------------------------------------------------------------------------------
-# Load inference model
-
-fid.create_inception_graph(PATH_INC)
-softmax = None
-
-#-------------------------------------------------------------------------------
-
-init = tf.global_variables_initializer()
-sess = tf.Session()
-with sess.as_default():
-    sess.run(init)
-    query_tensor = fid._get_inception_layer(sess)
-
-    if softmax is None:
-        softmax = inc.get_softmax(sess, query_tensor)
-
-    # Calculate FID
     if args.verbose:
-        print("#  -- Calculating FID...", flush=True)
-    mu_gen, sigma_gen = fid.calculate_activation_statistics(X, sess, batch_size=args.batch_size, verbose=args.verbose)
-    fid_value = fid.calculate_frechet_distance(mu_gen, sigma_gen, mu_real, sigma_real)
-    if args.verbose:
-        print("#  -- FID = %.5f" % fid_value)
+        print("# DEBUG:::PATH_INC = " + str(PATH_INC))
+        print("# DEBUG:::PATH_DATA = " + str(PATH_DATA))
 
-    # Calculate Inception score
-    if args.verbose:
-        print("#  -- Calculating Inception score...", flush=True)
-    inc_mean, inc_std = inc.get_inception_score(X, softmax, sess, splits=10,
-                                                batch_size=args.batch_size, verbose=args.verbose)
-    if args.verbose:
-        print("#  -- INC = %.5f +- %.5f" % (inc_mean, inc_std))
+    if args.verbose and args.gpu != "":
+        print("# Setting CUDA_VISIBLE_DEVICES to: " + str(args.gpu))
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
-    fwrite(OUT_FN, f'{fid_value:.4f},{inc_mean:.4f},{inc_std:.4f}')
+    # OUT_FN = str(PATH_DATA / f'test_inception_{str(np.random.randint(10000))}.csv')
+    # init_logfile(OUT_FN, "FID,IS_MEAN,IS_STD")
+
+    #-------------------------------------------------------------------------------
+    if args.verbose:
+        print("# Reading %d images..." % args.n_imgs, end="", flush=True)
+
+    # Read stats
+    f = np.load(args.stats)
+    mu_real, sigma_real = f['mu'][:], f['sigma'][:]
+    f.close()
+
+    X = np.array([imread(str(data[i])).astype(np.float32) for i in range(args.n_imgs)])
+
+    if args.verbose:
+        print("done")
+        print("# image values in range [%.2f, %.2f]" % (X.min(), X.max()))
+
+    #-------------------------------------------------------------------------------
+    # Load inference model
+
+    fid.create_inception_graph(PATH_INC)
+    softmax = None
+
+    #-------------------------------------------------------------------------------
+
+    init = tf.global_variables_initializer()
+    sess = tf.Session()
+    with sess.as_default():
+        sess.run(init)
+        query_tensor = fid._get_inception_layer(sess)
+
+        if softmax is None:
+            softmax = inc.get_softmax(sess, query_tensor)
+
+        # Calculate FID
+        if args.verbose:
+            print("#  -- Calculating FID...", flush=True)
+        mu_gen, sigma_gen = fid.calculate_activation_statistics(X, sess, batch_size=args.batch_size, verbose=args.verbose)
+        fid_value = fid.calculate_frechet_distance(mu_gen, sigma_gen, mu_real, sigma_real)
+        if args.verbose:
+            print("#  -- FID = %.5f" % fid_value)
+
+        # Calculate Inception score
+        if args.verbose:
+            print("#  -- Calculating Inception score...", flush=True)
+        inc_mean, inc_std = inc.get_inception_score(X, softmax, sess, splits=10,
+                                                    batch_size=args.batch_size, verbose=args.verbose)
+        if args.verbose:
+            print("#  -- INC = %.5f +- %.5f" % (inc_mean, inc_std))
+
+        # fwrite(OUT_FN, f'{fid_value:.4f},{inc_mean:.4f},{inc_std:.4f}')
+        fwrite(GBL_FN, f'{fid_value:.4f},{inc_mean:.4f},{inc_std:.4f},{partPath}')

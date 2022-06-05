@@ -122,7 +122,8 @@ class D_SNDCGAN(BaseDiscriminator):
     def penultimate(self, input):
         input = input * 2. - 1.
         output = self.main(input)
-        output = output.view(-1, self.n_features)
+        # output = output.view(-1, self.n_features)
+        output = torch.reshape(output,(-1, self.n_features))
         if self.normalize:
             output = F.normalize(output)
         return output
